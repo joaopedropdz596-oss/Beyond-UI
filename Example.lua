@@ -1,5 +1,5 @@
 _G.BEYOND_LIBRARY_ONLY = true
-local BeyondUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/STARLARP/StarHub-UI/main/StarHubUI.lua"))()
+local BeyondUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/joaopedropdz596-oss/Beyond-UI/refs/heads/main/BeyondHubUI.lua"))()
 _G.BEYOND_LIBRARY_ONLY = nil
 
 local Window = BeyondUI:CreateWindow({
