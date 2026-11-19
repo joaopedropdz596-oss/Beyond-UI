@@ -776,6 +776,7 @@ function StarHubUI:CreateWindow(cfg)
     StarHubUI.CurrentMainWindow = MainWindow
 
     local winScale = Instance.new("UIScale", MainWindow)
+    local baseWindowScale = 1
 
     local function UpdateResponsiveScale()
         local cam = workspace.CurrentCamera
@@ -786,13 +787,15 @@ function StarHubUI:CreateWindow(cfg)
         if isTouch or vp.X < 920 or vp.Y < 560 then
             local scaleX = (vp.X * 0.92) / 720
             local scaleY = (vp.Y * 0.90) / 485
-            winScale.Scale = math.clamp(math.min(scaleX, scaleY), 0.55, 0.92)
+            baseWindowScale = math.clamp(math.min(scaleX, scaleY), 0.55, 0.92)
         else
-            winScale.Scale = 1.0
+            baseWindowScale = 1.0
         end
+
+        -- A escala base é calculada uma vez e preservada nas animações.
+        winScale.Scale = baseWindowScale
     end
 
-    -- Mantem a escala calculada na inicializacao; nao aumenta depois.
     UpdateResponsiveScale()
 
     local CustomWallpaper = Instance.new("ImageLabel", MainWindow)
@@ -1243,11 +1246,16 @@ function StarHubUI:CreateWindow(cfg)
     local isMinimized = false
     local UpdateFloatingToggleVisual = nil
 
+    local windowToggleToken = 0
+
     local function ToggleMainWindow(show)
         if show == nil then show = not MainWindow.Visible end
+        windowToggleToken = windowToggleToken + 1
+        local thisToggle = windowToggleToken
+
         if show then
             MainWindow.Visible = true
-            winScale.Scale = 0.8
+            winScale.Scale = baseWindowScale * 0.8
             MainWindow.Position = UDim2.new(0.5, -WinSize.X.Offset/2, 0.5, -WinSize.Y.Offset/2)
             MainWindow.Size = isMinimized and UDim2.new(0, WinSize.X.Offset, 0, 44) or WinSize
             if isMinimized then
@@ -1259,23 +1267,19 @@ function StarHubUI:CreateWindow(cfg)
                 if BodyContainer then BodyContainer.Visible = true end
             end
             PlaySound("ToggleOn")
-            Tween(winScale, 0.35, {Scale = 1}, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+            Tween(winScale, 0.35, {Scale = baseWindowScale}, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
         else
             PlaySound("ToggleOff")
-            local tw = Tween(winScale, 0.22, {Scale = 0.8}, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+            local tw = Tween(winScale, 0.22, {Scale = baseWindowScale * 0.8}, Enum.EasingStyle.Back, Enum.EasingDirection.In)
             tw.Completed:Connect(function()
-                if not MainWindow.Visible or winScale.Scale <= 0.85 then
+                if thisToggle == windowToggleToken and not show then
                     MainWindow.Visible = false
-                    winScale.Scale = 1
-                end
-            end)
-            task.delay(0.24, function()
-                if not MainWindow.Visible or winScale.Scale <= 0.85 then
-                    MainWindow.Visible = false
-                    winScale.Scale = 1
+                    -- Mantem a escala original para a próxima abertura.
+                    winScale.Scale = baseWindowScale
                 end
             end)
         end
+
         if UpdateFloatingToggleVisual then
             pcall(UpdateFloatingToggleVisual)
         end
