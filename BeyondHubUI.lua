@@ -64,7 +64,7 @@ local StarHubUI = {
         WallpaperDimming = 0.35,
         BackgroundEffect = "Floating Bubbles",
         CustomWallpaperId = "",
-        CustomLogoUrl = "https://raw.githubusercontent.com/nibamako08-code/xd/main/content.png"
+        CustomLogoUrl = "https://raw.githubusercontent.com/joaopedropdz596-oss/Beyond-UI/main/content.png"
     },
     Themes = {
         NeverloseCrimson = {
@@ -741,7 +741,7 @@ function StarHubUI:CreateWindow(cfg)
         pcall(function() savedKey = Enum.KeyCode[StarHubUI.Settings.ToggleKey] end)
     end
     local ToggleKey = savedKey or cfg.ToggleKey or Enum.KeyCode.RightControl
-    local LogoInput = cfg.Logo or StarHubUI.Settings.CustomLogoUrl or "https://raw.githubusercontent.com/nibamako08-code/xd/main/content.png"
+    local LogoInput = cfg.Logo or StarHubUI.Settings.CustomLogoUrl or "https://raw.githubusercontent.com/joaopedropdz596-oss/Beyond-UI/main/content.png"
     local ResolvedLogo = LoadCustomImage(LogoInput, StarHubUI.Icons.Logo)
 
     local GuiParent = GetSafeGuiParent()
@@ -792,12 +792,8 @@ function StarHubUI:CreateWindow(cfg)
         end
     end
 
+    -- Mantem a escala calculada na inicializacao; nao aumenta depois.
     UpdateResponsiveScale()
-    pcall(function()
-        if workspace.CurrentCamera then
-            workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(UpdateResponsiveScale)
-        end
-    end)
 
     local CustomWallpaper = Instance.new("ImageLabel", MainWindow)
     CustomWallpaper.Size = UDim2.new(1, 0, 1, 0)
@@ -3755,9 +3751,8 @@ function StarHubUI:CreateWindow(cfg)
             })
         end)
 
-        GlassBox:AddActionRow("RESPONSIVE AUTO-SCALE", "Locked for PC (100%) & Auto-Fit for Mobile", StarHubUI.Icons.Zap, function()
-            UpdateResponsiveScale()
-            StarHubUI:Notify({Title = "RESPONSIVE SCALE", Content = "Display scale re-synchronized!", Badge = "SYSTEM"})
+        GlassBox:AddActionRow("RESPONSIVE AUTO-SCALE", "Scale is fixed at startup to prevent the UI from growing", StarHubUI.Icons.Zap, function()
+            StarHubUI:Notify({Title = "RESPONSIVE SCALE", Content = "Startup scale remains locked.", Badge = "SYSTEM"})
         end)
 
         GlassBox:AddToggle("SHOW FLOATING TOGGLE BUTTON", "Displays draggable Logo Squircle to open/close...", StarHubUI.Settings.ShowFloatingToggle, function(v)
@@ -3818,6 +3813,7 @@ function StarHubUI:CreateWindow(cfg)
                 local res = LoadCustomImage(txt, StarHubUI.Icons.Logo)
                 BrandIcon.Image = res
                 flIcon.Image = res
+                flIconShadow.Image = res
                 StarHubUI.Settings.CustomLogoUrl = txt
                 StarHubUI:AutoSave()
             end
